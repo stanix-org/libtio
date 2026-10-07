@@ -6,4 +6,5 @@ INCSDIR = $(PREFIX)/include/tio
 INCS = $(wildcard $(SRCDIR)/include/tio/*.h)
 SRCS = $(wildcard $(SRCDIR)/src/*.c)
 CFLAGS += -I$(SRCDIR)/include
+LDFLAGS += -lutils
 include $(TMAKE_DIR)/tmake-lib.mk 

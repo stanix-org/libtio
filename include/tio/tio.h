@@ -2,6 +2,7 @@
 #define TIO_H
 
 #include "types.h"
+#include "ctx.h"
 #include "error.h"
 #include "macro.h"
 #include "memory.h"

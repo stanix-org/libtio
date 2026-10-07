@@ -1,9 +1,11 @@
 #ifndef TIO_HANDLE_H
 #define TIO_HANDLE_H
 
+#include <libutils/list.h>
 #include "types.h"
 #include "atomic.h"
 #include "error.h"
+#include "ctx.h"
 
 typedef struct tio_handle_ops tio_handle_ops_t;
 typedef struct tio_handle tio_handle_t;
@@ -18,7 +20,9 @@ struct tio_handle_ops {
 
 struct tio_handle {
 	TIO_ATOMIC(size_t) ref_count;
+	utils_list_node_t node;
 	tio_handle_ops_t *ops;
+	tio_t *tio;
 };
 
 tio_ssize_t tio_handle_read(tio_handle_t *handle, void *buf, tio_size_t count);
@@ -30,7 +34,7 @@ tio_off_t tio_handle_tell(tio_handle_t *handle);
 #define TIO_SEEK_CUR 1
 #define TIO_SEEK_END 2
 
-tio_handle_t *tio_handle_init(tio_handle_t *handle, tio_handle_ops_t *ops);
+tio_handle_t *tio_handle_init(tio_t *tio, tio_handle_t *handle, tio_handle_ops_t *ops);
 
 static inline tio_handle_t *tio_handle_ref(tio_handle_t *handle) {
 	if (handle) TIO_ATOMIC_FETCH_ADD(&handle->ref_count, 1);
@@ -39,6 +43,6 @@ static inline tio_handle_t *tio_handle_ref(tio_handle_t *handle) {
 
 void tio_handle_release(tio_handle_t *handle);
 
-int tio_fd_handle_create(tio_handle_t **handle, int fd, tio_bool_t auto_close);
+int tio_fd_handle_create(tio_t *tio, tio_handle_t **handle, int fd, tio_bool_t auto_close);
 
 #endif

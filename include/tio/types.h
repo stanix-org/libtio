@@ -10,4 +10,7 @@ typedef ptrdiff_t tio_ssize_t;
 typedef int64_t   tio_off_t;
 typedef bool      tio_bool_t;
 
+#define TIO_TRUE true
+#define TIO_FALSE false
+
 #endif

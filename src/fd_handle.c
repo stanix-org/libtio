@@ -77,12 +77,12 @@ static tio_handle_ops_t tio_fd_handle_ops = {
 	.tell  = tio_fd_handle_tell,
 };
 
-int tio_fd_handle_create(tio_handle_t **handle, int fd, tio_bool_t auto_close) {
+int tio_fd_handle_create(tio_t *tio, tio_handle_t **handle, int fd, tio_bool_t auto_close) {
 	tio_fd_handle_t *fd_handle = tio_malloc(sizeof(tio_fd_handle_t));
 	if (!fd_handle) return TIO_ERROR_NO_MEMORY;
 	fd_handle->fd = fd;
 	fd_handle->auto_close = auto_close;
-	*handle = tio_handle_init(&fd_handle->handle, &tio_fd_handle_ops);
+	*handle = tio_handle_init(tio, &fd_handle->handle, &tio_fd_handle_ops);
 	return TIO_ERROR_SUCCESS;
 }
 
