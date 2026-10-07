@@ -1,0 +1,23 @@
+#!/bin/sh
+. "$(dirname "$0" )/tconf.sh"
+
+OPTIONS="MULTI_LANGUAGES"
+: ${MULTI_LANGUAGES:="yes"}
+tconf_init "$@"
+
+tconf_search_cc "$HOST"
+tconf_require "C compiler" "$CC"
+tconf_find_os
+
+tconf_require_header "$CC" unistd.h
+
+# check some functions
+tconf_check_func "$CC" "unistd.h" "open"
+tconf_check_func "$CC" "unistd.h" "close"
+tconf_check_func "$CC" "unistd.h" "seek"
+tconf_check_func "$CC" "unistd.h" "read"
+tconf_check_func "$CC" "unistd.h" "write"
+
+tconf_gen_makefiles "$SRCDIR/Makefile.in"
+
+tconf_fini

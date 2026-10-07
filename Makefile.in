@@ -1,0 +1,9 @@
+TMAKE_DIR = $(TOP)/make
+include $(TMAKE_DIR)/tmake-init.mk
+
+LIB = tio
+INCSDIR = $(PREFIX)/include/tio
+INCS = $(wildcard $(SRCDIR)/include/tio/*.h)
+SRCS = $(wildcard $(SRCDIR)/src/*.c)
+CFLAGS += -I$(SRCDIR)/include
+include $(TMAKE_DIR)/tmake-lib.mk 
