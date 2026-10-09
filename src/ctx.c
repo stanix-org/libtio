@@ -23,7 +23,7 @@ int tio_run(tio_t *tio) {
 		// TODO : poll fds
 		utils_vector_t pollfds;
 		utils_vector_init(&pollfds, sizeof(struct pollfd));
-		utils_list_foreach (node, &tio->fd_polls) {
+		utils_list_foreach (node, &tio->file_polls) {
 			tio_poll_t *poll = TIO_CONTAINER_OF(node, tio_poll_t, node);
 			struct pollfd fd = {
 				.fd = TIO_CONTAINER_OF(poll->handle, tio_fd_handle_t, handle)->fd,
@@ -47,7 +47,7 @@ int tio_run(tio_t *tio) {
 			return TIO_ERROR_IO;
 		}
 		size_t index = 0;
-		utils_list_foreach (node, &tio->fd_polls) {
+		utils_list_foreach (node, &tio->file_polls) {
 			tio_poll_t *poll = TIO_CONTAINER_OF(node, tio_poll_t, node);
 			struct pollfd *fd = utils_vector_at(&pollfds, index++);
 			if (fd->revents) {
