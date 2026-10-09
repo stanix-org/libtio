@@ -10,6 +10,7 @@ typedef ptrdiff_t tio_ssize_t;
 typedef intptr_t  tio_intptr_t;
 typedef int64_t   tio_off_t;
 typedef bool      tio_bool_t;
+typedef int       tio_mode_t;
 
 #define TIO_TRUE true
 #define TIO_FALSE false

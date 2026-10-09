@@ -1,10 +1,12 @@
 TMAKE_DIR = $(TOP)/make
 include $(TMAKE_DIR)/tmake-init.mk
 
+PLATFORM ?= unix
+
 LIB = tio
 INCSDIR = $(PREFIX)/include/tio
 INCS = $(wildcard $(SRCDIR)/include/tio/*.h)
-SRCS = $(wildcard $(SRCDIR)/src/*.c)
+SRCS = $(wildcard $(SRCDIR)/src/*.c) $(SRCDIR)/src/platform/$(PLATFORM).c
 CFLAGS += -I$(SRCDIR)/include
 LDFLAGS += -lutils
 include $(TMAKE_DIR)/tmake-lib.mk 

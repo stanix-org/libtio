@@ -9,19 +9,9 @@ tconf_search_cc "$HOST"
 tconf_require "C compiler" "$CC"
 tconf_find_os
 
-tconf_require_header "$CC" unistd.h
-
 if ! tconf_check_library "$CC" "utils" ; then
 	tconf_log "libutils is required, download it at https://github.com/stanix-org/libutils"
 fi
-
-# check some functions
-tconf_check_func "$CC" "fcntl.h" "open"
-tconf_check_func "$CC" "unistd.h" "close"
-tconf_check_func "$CC" "unistd.h" "lseek"
-tconf_check_func "$CC" "unistd.h" "read"
-tconf_check_func "$CC" "unistd.h" "write"
-tconf_check_func "$CC" "poll.h" "poll"
 
 tconf_gen_makefiles "$SRCDIR/Makefile.in"
 
