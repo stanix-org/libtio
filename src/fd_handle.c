@@ -1,16 +1,11 @@
-#include <tio/handle.h>
+#include <tio/fdhandle.h>
 #include <tio/memory.h>
 #include <tio/macro.h>
+#include <tio/poll.h>
 
 #if defined(HAVE_UNISTD_H) && defined(HAVE_CLOSE)
 #include <unistd.h>
 #include <errno.h>
-
-typedef struct tio_fd_handle {
-	tio_handle_t handle;
-	int fd;
-	tio_bool_t auto_close;
-} tio_fd_handle_t;
 
 static tio_ssize_t tio_convert_error(tio_ssize_t ret) {
 	if (ret >= 0) return ret;
@@ -69,12 +64,24 @@ static tio_off_t tio_fd_handle_tell(tio_handle_t *handle) {
 	return tio_convert_error(ret);
 }
 
+static int tio_fd_handle_start_poll(tio_handle_t *handle, tio_poll_t *poll) {
+	utils_list_append(&handle->tio->fd_polls, &poll->node);
+	return 0;
+}
+
+static int tio_fd_handle_stop_poll(tio_handle_t *handle, tio_poll_t *poll) {
+	utils_list_remove(&handle->tio->fd_polls, &poll->node);
+	return 0;
+}
+
 static tio_handle_ops_t tio_fd_handle_ops = {
-	.close = tio_fd_handle_close,
-	.read  = tio_fd_handle_read,
-	.write = tio_fd_handle_write,
-	.seek  = tio_fd_handle_seek,
-	.tell  = tio_fd_handle_tell,
+	.close       = tio_fd_handle_close,
+	.read        = tio_fd_handle_read,
+	.write       = tio_fd_handle_write,
+	.seek        = tio_fd_handle_seek,
+	.tell        = tio_fd_handle_tell,
+	.start_poll  = tio_fd_handle_start_poll,
+	.stop_poll   = tio_fd_handle_stop_poll,
 };
 
 int tio_fd_handle_create(tio_t *tio, tio_handle_t **handle, int fd, tio_bool_t auto_close) {

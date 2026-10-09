@@ -7,6 +7,7 @@
 
 typedef size_t    tio_size_t;
 typedef ptrdiff_t tio_ssize_t;
+typedef intptr_t  tio_intptr_t;
 typedef int64_t   tio_off_t;
 typedef bool      tio_bool_t;
 

@@ -9,6 +9,7 @@
 
 typedef struct tio_handle_ops tio_handle_ops_t;
 typedef struct tio_handle tio_handle_t;
+struct tio_poll;
 
 struct tio_handle_ops {
 	void (*close)(tio_handle_t *handle);
@@ -16,6 +17,8 @@ struct tio_handle_ops {
 	tio_off_t (*tell)(tio_handle_t *handle);
 	tio_ssize_t (*read)(tio_handle_t *handle, void *buf, tio_size_t count);
 	tio_ssize_t (*write)(tio_handle_t *handle, const void *buf, tio_size_t count);
+	int (*start_poll)(tio_handle_t *handle, struct tio_poll *poll);
+	int (*stop_poll)(tio_handle_t *handle, struct tio_poll *poll);
 };
 
 struct tio_handle {
@@ -42,7 +45,5 @@ static inline tio_handle_t *tio_handle_ref(tio_handle_t *handle) {
 }
 
 void tio_handle_release(tio_handle_t *handle);
-
-int tio_fd_handle_create(tio_t *tio, tio_handle_t **handle, int fd, tio_bool_t auto_close);
 
 #endif

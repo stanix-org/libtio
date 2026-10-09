@@ -8,6 +8,8 @@ typedef struct tio tio_t;
 
 struct tio {
 	utils_list_t handles;
+	utils_list_t sources;
+	utils_list_t fd_polls;
 	tio_bool_t quit;
 	int exit_code;
 };
