@@ -24,6 +24,7 @@ struct tio_source {
 	tio_t *tio;
 	tio_callback_t callback;
 	void *data;
+	tio_bool_t started;
 };
 
 /**

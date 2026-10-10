@@ -11,15 +11,25 @@ tio_source_t *tio_source_init(tio_t *tio, tio_source_t *source, tio_source_ops_t
 }
 
 int tio_source_start(tio_source_t *source, tio_callback_t callback, void *data) {
-	if (!source->ops || !source->ops->start) return TIO_ERROR_NOT_SUPP;
 	source->callback = callback;
 	source->data = data;
-	return source->ops->start(source);
+	if (source->started) return TIO_ERROR_SUCCESS;
+	if (!source->ops || !source->ops->start) return TIO_ERROR_NOT_SUPP;
+	int ret = source->ops->start(source);
+	if (TIO_IS_ERROR(ret)) return ret;
+	source->started = TIO_TRUE;
+	tio_source_ref(source);
+	return TIO_ERROR_SUCCESS;
 }
 
 int tio_source_stop(tio_source_t *source) {
+	if (!source->started) return TIO_ERROR_SUCCESS;
 	if (!source->ops || !source->ops->stop) return TIO_ERROR_NOT_SUPP;
-	return source->ops->stop(source);
+	int ret = source->ops->stop(source);
+	if (TIO_IS_ERROR(ret)) return ret;
+	tio_source_release(source);
+	source->started = TIO_FALSE;
+	return TIO_ERROR_SUCCESS;
 }
 
 void tio_source_release(tio_source_t *source) {
