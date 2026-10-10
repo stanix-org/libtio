@@ -79,12 +79,18 @@ void tio_platform_close(tio_intptr_t fd) {
 }
 
 int tio_platform_poll(tio_t *tio) {
-	// TODO : rewrite this to handle modifications 
-	// of pollfds as we iterate
 	utils_vector_t pollfds;
 	utils_vector_init(&pollfds, sizeof(struct pollfd));
+	utils_vector_t polls;
+	utils_vector_init(&polls, sizeof(tio_poll_t *));
+
 	utils_list_foreach (node, &tio->file_polls) {
 		tio_poll_t *poll = TIO_CONTAINER_OF(node, tio_poll_t, node);
+		
+		// we keep a ref to the poll source
+		// to prevent it from being freed while we poll
+		tio_source_ref(&poll->source);
+
 		struct pollfd fd = {
 			.fd = TIO_CONTAINER_OF(poll->handle, tio_file_handle_t, handle)->fd,
 			.events = 0,
@@ -99,20 +105,24 @@ int tio_platform_poll(tio_t *tio) {
 			fd.events |= POLLHUP;
 		}
 		utils_vector_push_back(&pollfds, &fd);
+		utils_vector_push_back(&polls, &poll);
 	}
 	int ret = poll(pollfds.data, pollfds.count, -1);
 	if (ret < 0) {
 		utils_vector_destroy(&pollfds);
+		utils_vector_destroy(&polls);
 		return tio_platform_get_error();
 	}
-	size_t index = 0;
-	utils_list_foreach (node, &tio->file_polls) {
-		tio_poll_t *poll = TIO_CONTAINER_OF(node, tio_poll_t, node);
-		struct pollfd *fd = utils_vector_at(&pollfds, index++);
+	utils_vector_typed_indexed_foreach (tio_poll_t *, poll_ptr, index, &polls) {
+		tio_poll_t *poll = *poll_ptr;
+		struct pollfd *fd = utils_vector_at(&pollfds, index);
 		if (fd->revents) {
 			tio_source_dispatch(&poll->source);
 		}
+	
+		tio_source_release(&poll->source);
 	}
 	utils_vector_destroy(&pollfds);
+	utils_vector_destroy(&polls);
 	return TIO_ERROR_SUCCESS;
 }
