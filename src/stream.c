@@ -151,7 +151,7 @@ int tio_stream_set_buf(tio_stream_t *stream, int type, tio_size_t size) {
 	if (type == TIO_STREAM_NO_BUF) {
 		size = 0;
 	} else if (size == 0) {
-		type = TIO_STREAM_NO_BUF;
+		size = 4096;
 	}
 
 	if (stream->buf_size != size) {

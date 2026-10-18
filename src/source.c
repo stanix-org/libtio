@@ -15,9 +15,9 @@ int tio_source_start(tio_source_t *source, tio_callback_t callback, void *data) 
 	source->data = data;
 	if (source->started) return TIO_ERROR_SUCCESS;
 	if (!source->ops || !source->ops->start) return TIO_ERROR_NOT_SUPP;
+	source->started = TIO_TRUE;
 	int ret = source->ops->start(source);
 	if (TIO_IS_ERROR(ret)) return ret;
-	source->started = TIO_TRUE;
 	tio_source_ref(source);
 	return TIO_ERROR_SUCCESS;
 }

@@ -3,11 +3,18 @@
 #include <tio/filehandle.h>
 #include <tio/poll.h>
 #include <tio/macro.h>
+#include <tio/timer.h>
 #include <libutils/vector.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <poll.h>
+#ifdef HAVE_CLOCK_GETTIME
+#include <time.h>
+#endif
+#ifdef HAVE_GETTIMEOFDAY
+#include <sys/time.h>
+#endif
 
 static int tio_platform_get_error(void) {
 	switch (errno) {
@@ -107,7 +114,7 @@ int tio_platform_poll(tio_t *tio) {
 		utils_vector_push_back(&pollfds, &fd);
 		utils_vector_push_back(&polls, &poll);
 	}
-	int ret = poll(pollfds.data, pollfds.count, -1);
+	int ret = poll(pollfds.data, pollfds.count, tio_timer_get_before_next_trigger(tio));
 	if (ret < 0) {
 		utils_vector_destroy(&pollfds);
 		utils_vector_destroy(&polls);
@@ -125,4 +132,18 @@ int tio_platform_poll(tio_t *tio) {
 	utils_vector_destroy(&pollfds);
 	utils_vector_destroy(&polls);
 	return TIO_ERROR_SUCCESS;
+}
+
+tio_time_t tio_platform_get_current_time(void) {
+#ifdef HAVE_CLOCK_GETTIME
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
+#elif defined(HAVE_GETTIMEOFDAY)
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec * 1000 + tv.tv_nsec / 1000;
+#else
+#error "no supported way of getting time"
+#endif
 }

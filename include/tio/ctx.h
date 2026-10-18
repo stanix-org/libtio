@@ -10,6 +10,7 @@ struct tio {
 	utils_list_t handles;
 	utils_list_t sources;
 	utils_list_t file_polls;
+	utils_list_t timers;
 	tio_bool_t quit;
 	int exit_code;
 };

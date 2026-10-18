@@ -5,6 +5,7 @@
 #include <tio/platform.h>
 #include <tio/macro.h>
 #include <tio/poll.h>
+#include <tio/timer.h>
 #include <string.h>
 #include <poll.h>
 
@@ -19,6 +20,7 @@ int tio_run(tio_t *tio) {
 	while (!tio->quit) {
 		int ret = tio_platform_poll(tio);
 		if (TIO_IS_ERROR(ret)) return ret;
+		tio_timer_dispatch(tio);
 	}
 	return tio->exit_code;
 }

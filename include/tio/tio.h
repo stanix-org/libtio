@@ -10,6 +10,7 @@
 #include "filehandle.h"
 #include "source.h"
 #include "poll.h"
+#include "timer.h"
 #include "stream.h"
 
 #endif

@@ -13,6 +13,9 @@ if ! tconf_check_library "$CC" "utils" ; then
 	tconf_log "libutils is required, download it at https://github.com/stanix-org/libutils"
 fi
 
+tconf_check_func "$CC" "sys/time.h" "gettimeofday"
+tconf_check_func "$CC" "time.h" "clock_gettime"
+
 tconf_gen_makefiles "$SRCDIR/Makefile.in"
 
 tconf_fini
