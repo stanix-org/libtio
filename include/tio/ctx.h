@@ -11,6 +11,8 @@ struct tio {
 	utils_list_t sources;
 	utils_list_t file_polls;
 	utils_list_t timers;
+	utils_list_t signals;
+	void *private;
 	tio_bool_t quit;
 	int exit_code;
 };

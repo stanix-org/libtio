@@ -3,6 +3,7 @@
 #include <tio/error.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdio.h>
 
 tio_ssize_t tio_stream_read(tio_stream_t *stream, void *buffer, tio_size_t count) {
 	if (tio_stream_have_error(stream)) return stream->error;
@@ -54,10 +55,9 @@ tio_ssize_t tio_stream_write(tio_stream_t *stream, const void *buffer, tio_size_
 		if (TIO_IS_ERROR(ret)) return ret;
 	}
 
-	// TODO : handle line buffering
-
 	const char *buf = buffer;
 	tio_ssize_t total = 0;
+	tio_bool_t need_flush = TIO_FALSE;
 	while (count > 0) {
 		if (stream->write_pos >= stream->write_end) {
 			tio_size_t pending = tio_stream_pending(stream);
@@ -65,16 +65,24 @@ tio_ssize_t tio_stream_write(tio_stream_t *stream, const void *buffer, tio_size_
 				tio_ssize_t w = tio_handle_write(stream->handle, stream->write_base, pending);
 				if (TIO_IS_ERROR(w)) return w;
 			}
+			need_flush = TIO_FALSE;
 			stream->write_base = stream->write_pos = stream->buf;
 			stream->write_end = stream->buf + stream->buf_size;
 		}
 		tio_size_t remaining = stream->write_end - stream->write_pos;
 		tio_size_t chunk_size = count < remaining ? count : remaining;
 		memcpy(stream->write_pos, buf, chunk_size);
+		if (stream->buf_type == TIO_STREAM_LINE_BUF && memchr(stream->write_pos, '\n', chunk_size)) {
+			need_flush = TIO_TRUE;
+		}
 		stream->write_pos += chunk_size;
 		count -= chunk_size;
 		buf += chunk_size;
 		total += chunk_size;
+	}
+	if (need_flush) {
+		int ret = tio_stream_flush(stream);
+		if (TIO_IS_ERROR(ret)) return ret;
 	}
 	return total;
 }

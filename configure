@@ -15,6 +15,10 @@ fi
 
 tconf_check_func "$CC" "sys/time.h" "gettimeofday"
 tconf_check_func "$CC" "time.h" "clock_gettime"
+tconf_check_func "$CC" "unistd.h" "pipe"
+tconf_check_func "$CC" "fcntl.h" "pipe2"
+tconf_check_func "$CC" "signal.h" "signal"
+tconf_check_func "$CC" "signal.h" "sigaction"
 
 tconf_gen_makefiles "$SRCDIR/Makefile.in"
 

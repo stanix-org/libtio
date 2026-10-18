@@ -11,6 +11,7 @@
 #include "source.h"
 #include "poll.h"
 #include "timer.h"
+#include "signal.h"
 #include "stream.h"
 
 #endif

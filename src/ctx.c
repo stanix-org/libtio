@@ -13,6 +13,11 @@ int tio_init(tio_t **tio) {
 	*tio = tio_malloc(sizeof(tio_t));
 	if (!*tio) return TIO_ERROR_NO_MEMORY;
 	memset(*tio, 0, sizeof(tio_t));
+	int ret = tio_platform_init(*tio);
+	if (TIO_IS_ERROR(ret)) {
+		tio_free(*tio);
+		return ret;
+	}
 	return TIO_ERROR_SUCCESS;
 }
 
@@ -32,6 +37,7 @@ void tio_fini(tio_t *tio) {
 		tio_handle_release(TIO_CONTAINER_OF(node, tio_handle_t, node));
 		node = next;
 	}
+	tio_platform_fini(tio);
 }
 
 void tio_quit(tio_t *tio, int exit_code) {
