@@ -45,13 +45,26 @@ static void tio_platform_dispatch_signal(tio_source_t *source, void *data) {
 	}
 	tio_t *tio = source->tio;
 	utils_list_node_t *node = tio->signals.first;
+
+	// build a temporary list
+	// to avoid issues where the usrr modify signals handlers
+	// while wd iterate
+	utils_vector_t signals;
+	utils_vector_init(&signals, sizeof(tio_signal_t *));
 	while (node) {
 		tio_signal_t *signal = TIO_CONTAINER_OF(node, tio_signal_t, node);
 		node = node->next;
 		if (signal->signum == signum) {
-			tio_source_dispatch(&signal->source);
+			tio_source_ref(&signal->source);
+			utils_vector_push_back(&signals, &signal);
 		}
 	}
+	utils_vector_typed_foreach (tio_signal_t *, ptr, &signals) {
+		tio_signal_t *signal = *ptr;
+		tio_source_dispatch(&signal->source);
+		tio_source_release(&signal->source);
+	}
+	utils_vector_destroy(&signals);
 }
 
 static int tio_platform_setup_signal_pipe(tio_t *tio) {
