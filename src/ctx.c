@@ -18,6 +18,7 @@ int tio_init(tio_t **tio) {
 		tio_free(*tio);
 		return ret;
 	}
+	(*tio)->progname = "tio program";
 	return TIO_ERROR_SUCCESS;
 }
 

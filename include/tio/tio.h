@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include "ctx.h"
+#include "log.h"
 #include "error.h"
 #include "macro.h"
 #include "memory.h"

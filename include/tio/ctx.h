@@ -12,9 +12,11 @@ struct tio {
 	utils_list_t file_polls;
 	utils_list_t timers;
 	utils_list_t signals;
+	const char *progname;
 	void *private;
-	tio_bool_t quit;
+	int log_level;
 	int exit_code;
+	tio_bool_t quit;
 };
 
 int tio_init(tio_t **tio);
